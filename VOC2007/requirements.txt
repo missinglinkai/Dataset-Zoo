@@ -1,0 +1,4 @@
+pathlib
+mali
+faker
+beautifulsoup4
