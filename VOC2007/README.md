@@ -29,4 +29,8 @@ we will not upload the metadata files.
 `mali data metadata add [VOLUME ID] -df metadata.json`
 
 
+### Commit the version
+`mali data commmit [VOLUME ID] -m [Message]`
+
+
 ![Query Console with Properties](resources/image1.png)
