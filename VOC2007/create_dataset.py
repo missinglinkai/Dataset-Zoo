@@ -39,7 +39,7 @@ trainval_split = set()
 
 split_sets = {'train': train_split, 'test': test_split, 'val': val_split, 'trainval': trainval_split}
 
-original_split_paths = Path(args.data).glob('Metadata/ImageSets/Main/*.txt')
+original_split_paths = Path(args.data).glob('ImageSets/Main/*.txt')
 for split_path in original_split_paths:
     t = get_file('', split_path)
     datapoint_splits = map(lambda x: str(x).split(' '), t)
@@ -59,16 +59,15 @@ for split_path in original_split_paths:
             s.add(bucket)
 
 
+LayoutTest = get_file(args.data, 'ImageSets/Layout/test.txt')
+LayoutTrain = get_file(args.data, 'ImageSets/Layout/train.txt')
+LayoutTrainVal = get_file(args.data, 'ImageSets/Layout/trainval.txt')
+LayoutVal = get_file(args.data, 'ImageSets/Layout/val.txt')
 
-LayoutTest = get_file(args.data, 'Metadata/ImageSets/Layout/test.txt')
-LayoutTrain = get_file(args.data, 'Metadata/ImageSets/Layout/train.txt')
-LayoutTrainVal = get_file(args.data, 'Metadata/ImageSets/Layout/trainval.txt')
-LayoutVal = get_file(args.data, 'Metadata/ImageSets/Layout/val.txt')
-
-SegmentationTest = get_file(args.data, 'Metadata/ImageSets/Segmentation/test.txt')
-SegmentationTrain = get_file(args.data, 'Metadata/ImageSets/Segmentation/train.txt')
-SegmentationTrainVal = get_file(args.data, 'Metadata/ImageSets/Segmentation/trainval.txt')
-SegmentationVal = get_file(args.data, 'Metadata/ImageSets/Segmentation/val.txt')
+SegmentationTest = get_file(args.data, 'ImageSets/Segmentation/test.txt')
+SegmentationTrain = get_file(args.data, 'ImageSets/Segmentation/train.txt')
+SegmentationTrainVal = get_file(args.data, 'ImageSets/Segmentation/trainval.txt')
+SegmentationVal = get_file(args.data, 'ImageSets/Segmentation/val.txt')
 
 
 def is_in_layout(bucket):
