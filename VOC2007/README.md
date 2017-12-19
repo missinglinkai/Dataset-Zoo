@@ -22,12 +22,15 @@ You should have 5 folders under data:
 Now that the metadata.json was produced you can safely remove the `ImageSets` folder. 
 we will not upload the metadata files.
 
+`rm -rf data/ImageSets`
+
+Upload the data files:
+
 `mali data add [VOLUME ID] --files ./data`
 
 ### Upload metadata:
 
 `mali data metadata add [VOLUME ID] -df metadata.json`
-
 
 ### Commit the version
 `mali data commmit [VOLUME ID] -m [Message]`
