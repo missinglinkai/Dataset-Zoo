@@ -27,3 +27,6 @@ we will not upload the metadata files.
 ### Upload metadata:
 
 `mali data metadata add [VOLUME ID] -df metadata.json`
+
+
+![Query Console with Properties](resources/image1.png)
