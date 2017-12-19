@@ -106,6 +106,31 @@ def get_original_split(bucket):
     if bucket in val_split:
         return 'val'
 
+
+def get_layout_split(bucket):
+    if is_in_layout(bucket):
+        if bucket in LayoutTest:
+            return 'test'
+        if bucket in LayoutVal:
+            return 'val'
+        if bucket in LayoutTrain:
+            return 'train'
+
+    return None
+
+
+def get_segmentation_split(bucket):
+    if is_in_segmentation(bucket):
+        if bucket in SegmentationTest:
+            return 'test'
+        if bucket in SegmentationVal:
+            return 'val'
+        if bucket in SegmentationTrain:
+            return 'train'
+
+    return None
+
+
 class_data = {}
 
 annotations = Path(args.data).glob('Annotations/*.xml')
@@ -123,7 +148,7 @@ for path in annotations:
 
     for o in objects:
         name = o.contents[1].contents[0]
-        data[name] = data[name] + 1 if data.has_key(name) else 1
+        data[name] = data[name] + 1 if name in data else 1
     class_data[bucket] = data
 
 metadataJson = {}  # 'file':{...}
@@ -137,12 +162,15 @@ for path in pathlist:
     bucket = str(stem)
 
     classes_data = dict(class_data[bucket])
-
-    original_split = get_original_split(bucket)
+    main_split = get_original_split(bucket)
+    layout_split = get_layout_split(bucket)
+    segmentation_split = get_segmentation_split(bucket)
 
     metadataJson[str(clean_path)] = enrich(bucket, merge_dicts(classes_data, {
         'type': 'Image',
-        'OriginalSplit': original_split,
+        'MainSplit': main_split,
+        'LayoutSplit': layout_split,
+        'SegmentationSplit': segmentation_split,
         'bucket': bucket,
     }))
 
@@ -150,7 +178,9 @@ for path in pathlist:
     if Path(args.data).joinpath(metadataFilename).exists():
         metadataJson[metadataFilename] = enrich(bucket, merge_dicts(classes_data, {
             'type': 'Annotation',
-            'OriginalSplit': original_split,
+            'MainSplit': main_split,
+            'LayoutSplit': layout_split,
+            'SegmentationSplit': segmentation_split,
             'bucket': bucket,
         }))
 
@@ -158,7 +188,9 @@ for path in pathlist:
     if Path(args.data).joinpath(metadataFilename).exists():
         metadataJson[metadataFilename] = enrich(bucket, merge_dicts(classes_data, {
             'type': 'SegmentationClass',
-            'OriginalSplit': original_split,
+            'MainSplit': main_split,
+            'LayoutSplit': layout_split,
+            'SegmentationSplit': segmentation_split,
             'bucket': bucket,
         }))
 
@@ -166,7 +198,9 @@ for path in pathlist:
     if Path(args.data).joinpath(metadataFilename).exists():
         metadataJson[metadataFilename] = enrich(bucket, merge_dicts(classes_data, {
             'type': 'SegmentationObject',
-            'OriginalSplit': original_split,
+            'MainSplit': main_split,
+            'LayoutSplit': layout_split,
+            'SegmentationSplit': segmentation_split,
             'bucket': bucket,
         }))
 
