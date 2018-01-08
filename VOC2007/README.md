@@ -2,9 +2,26 @@ Original Dataset from: http://host.robots.ox.ac.uk/pascal/VOC/voc2007/
 Documentation: http://host.robots.ox.ac.uk/pascal/VOC/voc2007/htmldoc/voc.html
 
 
-Dataset files: http://academictorrents.com/details/c9db37df1eb2e549220dc19f70f60f7786d067d4
+Dataset files: http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtrainval_06-Nov-2007.tar and http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtest_06-Nov-2007.tar 
 
-### Install
+http://academictorrents.com/details/c9db37df1eb2e549220dc19f70f60f7786d067d4
+
+
+
+### Download the dataset
+
+Run `./download_data.sh` - it will download the dataset (train, val and test) and place them under the data folder
+
+### Run the script to generate metadata
+
+`./create_dataset.py ./data`
+
+### Clean the data folder
+Before uploading the metadata we need to remove some unneeded 
+`rm -rf ./data/ImageSets`
+
+
+### Install Manually
 
 1. Create a new virtualenv
 2. run `pip install -r requirements.txt`

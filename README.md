@@ -5,3 +5,4 @@ Coming Soon
 * http://academictorrents.com/collection/deep-learning
 * https://www.ecse.rpi.edu/homepages/cvrl/database/AttributeDataset.htm
 * https://classif.ai
+* http://www.openslr.org/12

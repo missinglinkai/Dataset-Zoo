@@ -213,6 +213,3 @@ for path in pathlist:
             'bucket': bucket_value,
         }))
         dump_metadata_file(args.data, metadataFilename, metadataJson[metadataFilename])
-
-with open('metadata.json', 'w') as outfile:
-    json.dump(metadataJson, outfile)
