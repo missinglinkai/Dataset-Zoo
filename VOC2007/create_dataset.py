@@ -1,10 +1,7 @@
 from pathlib import Path
 import argparse
 import json
-from faker import Faker
 from bs4 import BeautifulSoup
-
-fake = Faker()
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('data', metavar='d', type=str, help='an integer for the accumulator')
@@ -13,6 +10,8 @@ args = parser.parse_args()
 empty_data = {'person': 0, 'bird': 0, 'cat': 0, 'cow': 0, 'dog': 0, 'horse': 0, 'sheep': 0, 'aeroplane': 0,
               'bicycle': 0, 'boat': 0, 'bus': 0, 'car': 0, 'motorbike': 0, 'train': 0,
               'bottle': 0, 'chair': 0, 'diningtable': 0, 'pottedplant': 0, 'sofa': 0, 'tvmonitor': 0}
+
+metadata_template_name = '{}.metadata.json'
 
 
 def get_file(base_path, path):
@@ -30,6 +29,11 @@ def merge_dicts(*dict_args):
     for dictionary in dict_args:
         result.update(dictionary)
     return result
+
+
+def dump_metadata_file(base_path, filename, content):
+    with open(str(Path(base_path).joinpath(metadata_template_name.format(filename)).absolute()), 'w') as outfile:
+        json.dump(content, outfile)
 
 
 test_split = set()
@@ -52,12 +56,11 @@ for split_path in original_split_paths:
 
     for datapoint in datapoint_splits:
         bucket = datapoint[0]
-        value = int(datapoint[len(datapoint)-1])
+        value = int(datapoint[len(datapoint) - 1])
 
         if value == 1:
             s = split_sets[split]
             s.add(bucket)
-
 
 LayoutTest = get_file(args.data, 'ImageSets/Layout/test.txt')
 LayoutTrain = get_file(args.data, 'ImageSets/Layout/train.txt')
@@ -97,6 +100,7 @@ def enrich_segmentation(bucket, data):
 def enrich(bucket, data):
     return enrich_segmentation(bucket, enrich_layout(bucket, data)) if is_in_layout(bucket) or is_in_segmentation(
         bucket) else data
+
 
 def get_original_split(bucket):
     if bucket in train_split:
@@ -160,6 +164,7 @@ for path in pathlist:
     name = clean_path.name
     stem = clean_path.stem
     bucket = str(stem)
+    bucket_value = int(bucket)
 
     classes_data = dict(class_data[bucket])
     main_split = get_original_split(bucket)
@@ -171,8 +176,10 @@ for path in pathlist:
         'MainSplit': main_split,
         'LayoutSplit': layout_split,
         'SegmentationSplit': segmentation_split,
-        'bucket': bucket,
+        'bucket': bucket_value,
     }))
+
+    dump_metadata_file(args.data, str(clean_path), metadataJson[str(clean_path)])
 
     metadataFilename = 'Annotations/{}.xml'.format(stem)
     if Path(args.data).joinpath(metadataFilename).exists():
@@ -181,8 +188,9 @@ for path in pathlist:
             'MainSplit': main_split,
             'LayoutSplit': layout_split,
             'SegmentationSplit': segmentation_split,
-            'bucket': bucket,
+            'bucket': bucket_value,
         }))
+        dump_metadata_file(args.data, metadataFilename, metadataJson[metadataFilename])
 
     metadataFilename = 'SegmentationClass/{}.png'.format(stem)
     if Path(args.data).joinpath(metadataFilename).exists():
@@ -191,8 +199,9 @@ for path in pathlist:
             'MainSplit': main_split,
             'LayoutSplit': layout_split,
             'SegmentationSplit': segmentation_split,
-            'bucket': bucket,
+            'bucket': bucket_value,
         }))
+        dump_metadata_file(args.data, metadataFilename, metadataJson[metadataFilename])
 
     metadataFilename = 'SegmentationObject/{}.png'.format(stem)
     if Path(args.data).joinpath(metadataFilename).exists():
@@ -201,8 +210,9 @@ for path in pathlist:
             'MainSplit': main_split,
             'LayoutSplit': layout_split,
             'SegmentationSplit': segmentation_split,
-            'bucket': bucket,
+            'bucket': bucket_value,
         }))
+        dump_metadata_file(args.data, metadataFilename, metadataJson[metadataFilename])
 
 with open('metadata.json', 'w') as outfile:
     json.dump(metadataJson, outfile)
