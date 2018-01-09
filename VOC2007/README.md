@@ -7,10 +7,20 @@ Run `./download_data.sh` - it will download the dataset (train, val and test) an
 `./create_metadata.py ./data`
 
 ### Clean the data folder
-Before uploading the metadata we need to remove some unneeded 
+Before uploading the metadata we need to remove some unneeded files
+
+
 `rm -rf ./data/ImageSets`
 
 ### Sync the data:
+We need to sync the data to a specific data volume. To list the data volumes you have access to run:
+
+`mali data list`
+
+It should produce a list of data volumes with ID's. You can create a new data volume on the console.
+
+
+Once you have a Volume ID sync the data folder into it.
 
 `mali data sync [VOLUME ID] --dataPath ./data`
 
