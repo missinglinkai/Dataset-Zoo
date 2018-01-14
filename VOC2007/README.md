@@ -1,3 +1,6 @@
+### Setup Environment
+create a new virtualenv and install the requirements.txt
+
 ### Download the dataset
 
 Run `./download_data.sh` - it will download the dataset (train, val and test) and place them under the data folder
