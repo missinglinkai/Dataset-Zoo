@@ -172,7 +172,7 @@ for path in pathlist:
 
     dump_metadata_file(args.data, str(clean_path), metadataJson[str(clean_path)])
 
-    metadataFilename = 'Annotations/{}.xml'.format(stem)
+    metadataFilename = 'Annotations/{}.xml'.format(bucket)
     if os.path.exists(os.path.join(args.data, metadataFilename)):
         metadataJson[metadataFilename] = enrich(bucket, merge_dicts(classes_data, {
             'type': 'Annotation',
@@ -183,7 +183,7 @@ for path in pathlist:
         }))
         dump_metadata_file(args.data, metadataFilename, metadataJson[metadataFilename])
 
-    metadataFilename = 'SegmentationClass/{}.png'.format(stem)
+    metadataFilename = 'SegmentationClass/{}.png'.format(bucket)
     if os.path.exists(os.path.join(args.data, metadataFilename)):
         metadataJson[metadataFilename] = enrich(bucket, merge_dicts(classes_data, {
             'type': 'SegmentationClass',
@@ -194,7 +194,7 @@ for path in pathlist:
         }))
         dump_metadata_file(args.data, metadataFilename, metadataJson[metadataFilename])
 
-    metadataFilename = 'SegmentationObject/{}.png'.format(stem)
+    metadataFilename = 'SegmentationObject/{}.png'.format(bucket)
     if os.path.exists(os.path.join(args.data, metadataFilename)):
         metadataJson[metadataFilename] = enrich(bucket, merge_dicts(classes_data, {
             'type': 'SegmentationObject',
