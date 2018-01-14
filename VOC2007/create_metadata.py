@@ -1,10 +1,12 @@
-from pathlib import Path
 import argparse
 import json
-from bs4 import BeautifulSoup
+import glob
+import os
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('data', metavar='d', type=str, help='an integer for the accumulator')
+from collections import defaultdict
+
+parser = argparse.ArgumentParser()
+parser.add_argument('data', metavar='d', type=str)
 args = parser.parse_args()
 
 empty_data = {'person': 0, 'bird': 0, 'cat': 0, 'cow': 0, 'dog': 0, 'horse': 0, 'sheep': 0, 'aeroplane': 0,
@@ -15,9 +17,8 @@ metadata_template_name = '{}.metadata.json'
 
 
 def get_file(base_path, path):
-    with open(str(Path(base_path).joinpath(path).absolute())) as fp:
-        lines = set(map(lambda x: str(x).strip('\n'), fp))
-    return lines
+    filepath = os.path.join(base_path, path)
+    return [l.strip() for l in open(filepath, 'rb').readlines()]
 
 
 def merge_dicts(*dict_args):
@@ -32,31 +33,27 @@ def merge_dicts(*dict_args):
 
 
 def dump_metadata_file(base_path, filename, content):
-    with open(str(Path(base_path).joinpath(metadata_template_name.format(filename)).absolute()), 'w') as outfile:
+    with open(os.path.join(base_path, metadata_template_name.format(filename)), 'w') as outfile:
         json.dump(content, outfile)
 
 
-test_split = set()
-train_split = set()
-val_split = set()
-trainval_split = set()
+split_sets = defaultdict(set)
 
-split_sets = {'train': train_split, 'test': test_split, 'val': val_split, 'trainval': trainval_split}
+original_split_paths = glob.glob(os.path.join(args.data, 'ImageSets/Main/*.txt'))
 
-original_split_paths = Path(args.data).glob('ImageSets/Main/*.txt')
 for split_path in original_split_paths:
     t = get_file('', split_path)
-    datapoint_splits = map(lambda x: str(x).split(' '), t)
+    datapoint_splits = map(lambda x: x.split(' '), t)
 
-    path_in_str = str(split_path)
-    clean_path = split_path.relative_to(args.data)
-    stem = clean_path.stem
-    stems = str(stem).split('_')
-    split = stems[len(stems) - 1]
+    path_in_str = split_path
+    clean_path = os.path.relpath(split_path, args.data)
+    stem = os.path.splitext(os.path.basename(clean_path))[0]
+    stems = stem.split('_')
+    split = stems[-1]
 
     for datapoint in datapoint_splits:
         bucket = datapoint[0]
-        value = int(datapoint[len(datapoint) - 1])
+        value = int(datapoint[-1])
 
         if value == 1:
             s = split_sets[split]
@@ -103,12 +100,9 @@ def enrich(bucket, data):
 
 
 def get_original_split(bucket):
-    if bucket in train_split:
-        return 'train'
-    if bucket in test_split:
-        return 'test'
-    if bucket in val_split:
-        return 'val'
+    for split in ['train', 'test', 'val']:
+        if bucket in split_sets[split]:
+            return split
 
 
 def get_layout_split(bucket):
@@ -137,33 +131,30 @@ def get_segmentation_split(bucket):
 
 class_data = {}
 
-annotations = Path(args.data).glob('Annotations/*.xml')
+annotations = glob.glob(os.path.join(args.data, 'Annotations/*.xml'))
 for path in annotations:
-    with open(str(Path(path).absolute())) as fp:
-        soup = BeautifulSoup(fp, "html.parser")
+    import xml.etree.ElementTree
 
-    path_in_str = str(path)
-    clean_path = path.relative_to(args.data)
-    stem = clean_path.stem
-    bucket = str(stem)
+    e = xml.etree.ElementTree.parse(path)
 
-    objects = soup.findAll('object')
+    clean_path = os.path.relpath(path, args.data)
+    bucket = os.path.splitext(os.path.basename(clean_path))[0]
+
+    objects = e.findall('object')
     data = dict(empty_data)
 
     for o in objects:
-        name = o.contents[1].contents[0]
-        data[name] = data[name] + 1 if name in data else 1
+        name = o.find('name').text
+        data[name] += 1
+
     class_data[bucket] = data
 
 metadataJson = {}  # 'file':{...}
-pathlist = Path(args.data).glob('JPEGImages/*.jpg')
+pathlist = glob.glob(os.path.join(args.data, 'JPEGImages/*.jpg'))
 for path in pathlist:
     # because path is object not string
-    path_in_str = str(path)
-    clean_path = path.relative_to(args.data)
-    name = clean_path.name
-    stem = clean_path.stem
-    bucket = str(stem)
+    clean_path = os.path.relpath(path, args.data)
+    bucket = os.path.splitext(os.path.basename(clean_path))[0]
     bucket_value = int(bucket)
 
     classes_data = dict(class_data[bucket])
@@ -182,7 +173,7 @@ for path in pathlist:
     dump_metadata_file(args.data, str(clean_path), metadataJson[str(clean_path)])
 
     metadataFilename = 'Annotations/{}.xml'.format(stem)
-    if Path(args.data).joinpath(metadataFilename).exists():
+    if os.path.exists(os.path.join(args.data, metadataFilename)):
         metadataJson[metadataFilename] = enrich(bucket, merge_dicts(classes_data, {
             'type': 'Annotation',
             'MainSplit': main_split,
@@ -193,7 +184,7 @@ for path in pathlist:
         dump_metadata_file(args.data, metadataFilename, metadataJson[metadataFilename])
 
     metadataFilename = 'SegmentationClass/{}.png'.format(stem)
-    if Path(args.data).joinpath(metadataFilename).exists():
+    if os.path.exists(os.path.join(args.data, metadataFilename)):
         metadataJson[metadataFilename] = enrich(bucket, merge_dicts(classes_data, {
             'type': 'SegmentationClass',
             'MainSplit': main_split,
@@ -204,7 +195,7 @@ for path in pathlist:
         dump_metadata_file(args.data, metadataFilename, metadataJson[metadataFilename])
 
     metadataFilename = 'SegmentationObject/{}.png'.format(stem)
-    if Path(args.data).joinpath(metadataFilename).exists():
+    if os.path.exists(os.path.join(args.data, metadataFilename)):
         metadataJson[metadataFilename] = enrich(bucket, merge_dicts(classes_data, {
             'type': 'SegmentationObject',
             'MainSplit': main_split,
