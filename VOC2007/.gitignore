@@ -1,3 +1,6 @@
 .venv
 temp
 data
+data_clone
+new_data
+small_dataset
