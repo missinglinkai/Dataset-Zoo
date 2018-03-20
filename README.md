@@ -1,8 +1,3 @@
-Coming Soon
+###VOC2007
 
-
-###Interesting Datasets: 
-* http://academictorrents.com/collection/deep-learning
-* https://www.ecse.rpi.edu/homepages/cvrl/database/AttributeDataset.htm
-* https://classif.ai
-* http://www.openslr.org/12
+Upload and sync data using VOC2007 https://github.com/missinglinkai/Dataset-Zoo/tree/master/VOC2007
