@@ -7,7 +7,7 @@ Run `./download_data.sh` - it will download the dataset (train, val and test) an
 
 ### Run the script to generate metadata
 
-`./create_metadata.py ./data`
+`python ./create_metadata.py ./data`
 
 ### Clean the data folder
 Before uploading the metadata we need to remove some unneeded files

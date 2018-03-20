@@ -18,7 +18,7 @@ metadata_template_name = '{}.metadata.json'
 
 def get_file(base_path, path):
     filepath = os.path.join(base_path, path)
-    return [l.strip() for l in open(filepath, 'rb').readlines()]
+    return [l.strip() for l in open(filepath, 'r').readlines()]
 
 
 def merge_dicts(*dict_args):
