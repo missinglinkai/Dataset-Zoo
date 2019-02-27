@@ -3,6 +3,9 @@ create a new virtualenv and install the requirements.txt
 
 ### Download the dataset
 
+Prerequisite - you need to have `wget` available on your machine.
+On OSX, run `brew install wget` if you don't have it installed.
+
 Run `./download_data.sh` - it will download the dataset (train, val and test) and place them under the data folder
 
 ### Run the script to generate metadata
@@ -18,18 +21,18 @@ Before uploading the metadata we need to remove some unneeded files
 ### Sync the data:
 We need to sync the data to a specific data volume. To list the data volumes you have access to run:
 
-`mali data list`
+`ml data list`
 
 It should produce a list of data volumes with ID's. You can create a new data volume on the console.
 
 
 Once you have a Volume ID sync the data folder into it.
 
-`mali data sync [VOLUME ID] --dataPath ./data`
+`ml data sync [VOLUME ID] --data-path ./data`
 
 ### Commit the version
 
-`mali data commmit [VOLUME ID] -m [Message]`
+`ml data commmit [VOLUME ID] -m [Message]`
 
 
 ![Query Console with Properties](resources/image1.png)
